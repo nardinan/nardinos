@@ -1,5 +1,5 @@
-SOURCES = $(wildcard drivers/*.c kernel/*.c)
-HEADERS = $(wildcard drivers/*.h kernel/*.h)
+SOURCES = $(wildcard kernel/*.c kernel/*/*.c drivers/*.c drivers/*/*.c)
+HEADERS = $(wildcard kernel/*.h kernel/*/*.c drivers/*.h drivers/*/*.h)
 OBJ = ${SOURCES:.c=.o}
 CC = /usr/local/i386_elf_gcc/bin/i386-elf-gcc
 GDB = /usr/local/i386_elf_gcc/bin/i386-elf-gdb
@@ -34,6 +34,7 @@ debug: nardinos.bin kernel.elf
 	nasm $< -f bin -o $@
 
 clean:
-	rm -rf *.bin *.dis *.o nardinos.bin *.elf
+	rm -f *.bin *.dis *.o nardinos.bin *.elf
+	rm -f `find . -name *.o`
 	rm -rf kernel/*.o drivers/*.o
 
