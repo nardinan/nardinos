@@ -1,2 +1,2 @@
 # nardinos
-An attempt to make a retarded operating system from scratch.
+A tiny OS (from scratch) - just an exercise
