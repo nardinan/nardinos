@@ -65,4 +65,5 @@ extern void raw_video_scroll(s_raw_video_configuration *video_configuration, uns
 extern void raw_video_cursor(s_raw_video_configuration *video_configuration, 
     enum e_raw_video_cursor_actions action);
 extern void raw_video_print_string(s_raw_video_configuration *video_configuration, const char *buffer);
+extern void raw_video_clear_screen(s_raw_video_configuration *video_configuration);
 #endif

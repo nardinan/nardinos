@@ -13,6 +13,3 @@ int string_compare(const char *buffer, const char *other_buffer) {
   }
   return (*other_buffer - *buffer);
 }
-int is_printable(char character) {
-  return ((character >= 0x20) && (character <= 0x7f));
-}

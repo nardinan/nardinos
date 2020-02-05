@@ -9,7 +9,7 @@ void raw_video_set(s_raw_video_configuration *video_configuration,
   video_configuration->flags = flags;
 }
 void raw_video_print_byte(s_raw_video_configuration *video_configuration, char data) {
-  if (video_configuration->_maximum_cols > video_configuration->col) {
+  if (video_configuration->_maximum_cols > video_configuration->col)
     if (video_configuration->_maximum_rows > video_configuration->row) {
       /* we need to calculate the memory offset but, we need to 
        * keep in mind the fact that each character is a pair of
@@ -23,7 +23,6 @@ void raw_video_print_byte(s_raw_video_configuration *video_configuration, char d
         raw_video_cursor(video_configuration, e_raw_video_cursor_action_step_forward);
       }
     }
-  }
 }
 void raw_video_scroll(s_raw_video_configuration *video_configuration, unsigned int rows) {
   size_t memory_offset = (rows * (video_configuration->_maximum_cols * 2)), total_memory;
@@ -34,9 +33,8 @@ void raw_video_scroll(s_raw_video_configuration *video_configuration, unsigned i
         (total_memory - memory_offset));
     memory_set(video_configuration->_memory_video_entry_point + (total_memory - memory_offset), 
         0, memory_offset);
-  } else {
+  } else
     memory_set(video_configuration->_memory_video_entry_point, 0, total_memory);
-  }
 }
 void raw_video_cursor(s_raw_video_configuration *video_configuration, 
     e_raw_video_cursor_actions action) {
@@ -66,18 +64,23 @@ void raw_video_cursor(s_raw_video_configuration *video_configuration,
       break;
   }
   if ((video_configuration->_maximum_rows <= video_configuration->row) && 
-      ((video_configuration->flags&e_raw_video_flag_scrollable))) {
+      ((video_configuration->flags & e_raw_video_flag_scrollable))) {
     size_t rows_offset = ((video_configuration->row - video_configuration->_maximum_rows) + 1);
     raw_video_scroll(video_configuration, rows_offset);
+    video_configuration->col = 0;
+    video_configuration->row = (video_configuration->_maximum_rows - 1);
   }
 }
 void raw_video_print_string(s_raw_video_configuration *video_configuration, const char *buffer) {
   int backup_flags;
   while (*buffer != 0) {
-      raw_video_print_byte(video_configuration, *buffer);
-/*    switch (*buffer) {
+    switch (*buffer) {
       case RAW_VIDEO_LINE_FEED:
+        /* we are considering the line feed as a new line plus the line 
+         * home call, as the line feed character on linux and not the 
+         * line feed character on BIOS */
         raw_video_cursor(video_configuration, e_raw_video_cursor_action_line_forward);
+        raw_video_cursor(video_configuration, e_raw_video_cursor_action_line_home);
         break;
       case RAW_VIDEO_CARRIAGE_RETURN:
         raw_video_cursor(video_configuration, e_raw_video_cursor_action_line_home);
@@ -85,12 +88,22 @@ void raw_video_print_string(s_raw_video_configuration *video_configuration, cons
       case RAW_VIDEO_DELETE:
         raw_video_cursor(video_configuration, e_raw_video_cursor_action_step_back);
         backup_flags = video_configuration->flags;
+        /* in order to empty the character, we replace it with a zero and we 
+         * temporarly disable the cursor advance option (if enabled). At the 
+         * end of the operation, we restore it */
         video_configuration->flags &= ~e_raw_video_flag_advance_cursor;
-        raw_video_print_byte(video_configuration, ' ');
+        raw_video_print_byte(video_configuration, 0);
         video_configuration->flags = backup_flags;
         break;
       default:
-    }*/
+        raw_video_print_byte(video_configuration, *buffer);
+        break;
+    }
     ++buffer;
   }
+}
+void raw_video_clear_screen(s_raw_video_configuration *video_configuration) {
+  size_t total_memory = ((video_configuration->_maximum_cols * 
+        video_configuration->_maximum_rows) * 2);
+  memory_set(video_configuration->_memory_video_entry_point, 0, total_memory);
 }

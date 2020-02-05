@@ -3,5 +3,4 @@
 #include "memory.h"
 extern size_t string_length(const char *buffer);
 extern int string_compare(const char *buffer, const char *other_buffer);
-extern int is_printable(char character);
 #endif
