@@ -21,4 +21,11 @@ void main() {
   memory_free(string_2);
   char *string_4 = (char *)memory_alloc(20);
   raw_video_print_string(&screen, string_4);
+  memory_free(string_4);
+  memory_free(string_1);
+  size_t length = string_create(NULL_PTR, "this is a random value %s that should show something like %d %% and %c\n", "'ANDREW'", 1028, 'X');
+  char *final_string = (char *)memory_alloc(length + 1);
+  string_create(final_string, "this is a random value %s that should show something like %d %% and %c\n", "'ANDREW'", 1028, 'X');
+  raw_video_print_string(&screen, final_string);
+
 }
