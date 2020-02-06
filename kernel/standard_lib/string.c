@@ -13,3 +13,11 @@ int string_compare(const char *buffer, const char *other_buffer) {
   }
   return (*other_buffer - *buffer);
 }
+void string_copy(char *destination, const char *source) {
+  while (*source != 0) {
+    *destination = *source;
+    ++destination;
+    ++source;
+  }
+  *destination = 0;
+}

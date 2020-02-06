@@ -3,4 +3,5 @@
 #include "memory.h"
 extern size_t string_length(const char *buffer);
 extern int string_compare(const char *buffer, const char *other_buffer);
+extern void string_copy(char *destination, const char *source);
 #endif
