@@ -12,13 +12,15 @@ void memory_move(unsigned char *destination, unsigned char *source, size_t size)
       --size;
     }
   } else if (source < destination) {
-    destination += size;
-    source += size;
-    while (size > 0) {
-      *destination = *source;
-      --destination;
-      --source;
-      --size;
+    if (size > 0) {
+      destination += (size - 1);
+      source += (size - 1);
+      while (size > 0) {
+        *destination = *source;
+        --destination;
+        --source;
+        --size;
+      }
     }
   } 
   /* if the source and the destination are the same, 

@@ -23,9 +23,9 @@ void main() {
   raw_video_print_string(&screen, string_4);
   memory_free(string_4);
   memory_free(string_1);
-  size_t length = string_create(NULL_PTR, "this is a random value %s that should show something like %d %% and %c\n", "'ANDREW'", 1028, 'X');
+  size_t length = string_create(NULL_PTR, "this is a random value %s that should show something like %d %2f %% and %c\n", "'ANDREW'", -2512, 3.1415, 'X');
   char *final_string = (char *)memory_alloc(length + 1);
-  string_create(final_string, "this is a random value %s that should show something like %d %% and %c\n", "'ANDREW'", 1028, 'X');
+  string_create(final_string, "this is a random value %s that should show something like %d %4f %% and %c\n", "'ANDREW'", -2512, 3.1415, 'X');
   raw_video_print_string(&screen, final_string);
 
 }

@@ -18,7 +18,7 @@ call print_bx_string_nl
 mov bx, stored_loading_kernel_message
 call print_bx_string_nl
 mov bx, KERNEL_OFFSET
-mov dh, 10
+mov dh, 20
 mov dl, [stored_local_disk]
 call load_kernel_from_disk_dl
 mov bx, stored_leaving_16bit_message

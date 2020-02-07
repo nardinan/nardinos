@@ -21,70 +21,143 @@ void string_copy(char *destination, const char *source) {
   }
   *destination = 0;
 }
-/* I have to be honest, I've peeked into the stdarg function because seems that this
- * is the amount of size each argument takes into the stack. I am surprised as well
- * because I had no idea. Now I know.
- */
-#define argument_size_in_stack(type)\
-  (((sizeof(type)+sizeof(int)-1)/sizeof(int))*sizeof(int))
-/* we need to collect the current element and we need to increase the pointer in
- * order to be able to access the next element at the next call */
-#define string_next_argument(valist,type)\
-  (((valist) = (valist)+argument_size_in_stack(type)), *((type *)((valist)-argument_size_in_stack(type))))
+size_t string_from_int(char *destination, int value) {
+  size_t result = 0;
+  int was_negative = ((value < 0)?1:0);
+  if (was_negative) 
+    value *= -1.0;  /* we want to use the absolute value
+                     * and keep track of the sign of the 
+                     * value with the was_negative flag 
+                     */
+  if (value > 0) {
+    while (value > 0) {
+      int digit = (value % 10);
+      value = (value - digit) / 10;
+      if (destination) {
+        if (result > 0)
+          memory_move((unsigned char *)(destination + 1), 
+              (unsigned char *)destination, result);
+        *destination = ('0' + digit);
+      }
+      ++result;
+    }
+  } else {
+    if (destination)
+      *destination = '0';
+    ++result;
+  }
+  /* now, in case the sign of the argument was zero, we need to restore it */
+  if (was_negative) {
+    if (destination) {
+      if (result > 0)
+        memory_move((unsigned char *)(destination + 1),
+            (unsigned char *)destination, result);
+      *destination = '-';
+    }
+    ++result;
+  }
+  return result;
+}
+size_t string_from_double(char *destination, double value, int precision) {
+  size_t result = 0;
+  int decimal_part = value, normalized_fractional_part = 0;
+  double fractional_part = ((value - (double)decimal_part) * 
+      ((decimal_part < 0)?-1:1)); 
+  result = string_from_int(destination, decimal_part);
+  if (destination) {
+    destination += result;
+    *destination = '.';
+    ++destination;
+  }
+  ++result;
+  while ((fractional_part > 0) && ((precision < 0) || (precision > 0))) {
+    fractional_part *= 10.0;
+    if (destination) {
+      *destination = ('0' + ((int)fractional_part));
+      ++destination;
+    }
+    --precision;
+    ++result;
+    fractional_part -= ((int)fractional_part);
+  }
+  return result;
+}
 size_t string_create(char *destination, const char *format, ...) {
   size_t result = 0;
-  unsigned char *argument_pointer = __builtin_next_arg(format);
+  unsigned char *argument_pointer = grab_pointer_first_variable_argument(format);
+  unsigned int double_precision = STRING_DOUBLE_DEFAULT_PRECISION;
   while (*format != 0) {
     if (*format == '%') {
-      int move_next_argument = 1, payload_int, entries = 0;
-      char payload_character, *payload_string;
-      switch (*(format + 1)) {
-        case 'c':
-          payload_character = (char)string_next_argument(argument_pointer, int);
-          if (destination) {
-            *destination = payload_character;
-            ++destination;
-          }
-          ++result;
-          break;
-        case '%':
-          if (destination) {
-            *destination = *format;
-            ++destination;
-          }
-          ++result;
-          move_next_argument = 0;
-          break;
-        case 's':
-          payload_string = string_next_argument(argument_pointer, char *);
-          while (*payload_string != 0) {
+      int new_precision_ongoing = 0, continue_loop;
+      do {
+        int payload_int, entries = 0;
+        char payload_character, *payload_string;
+        double payload_double;
+        continue_loop = 0;
+        switch (*(format + 1)) {
+          case 'c':
+          case 'C':
+            payload_character = (char)grab_next_argument(argument_pointer, int);
             if (destination) {
-              *destination = *payload_string;
+              *destination = payload_character;
               ++destination;
             }
-            ++payload_string;
             ++result;
-          }
-          break;
-        case 'd':
-          payload_int = string_next_argument(argument_pointer, int);
-          while (payload_int > 0) {
-            int operand = payload_int % 10;
-            payload_int = (payload_int - operand) / 10;
+            break;
+          case '%':
             if (destination) {
-              if (entries > 0)
-                memory_move((destination + 1), destination, entries);
-              *destination = ('0' + operand);
+              *destination = *format;
+              ++destination;
             }
-            ++entries;
             ++result;
-          }
-          if (destination)
-            destination += entries;
-          break;
-        default:
-          break;
-      }
+            break;
+          case 's':
+          case 'S':
+            payload_string = grab_next_argument(argument_pointer, char *);
+            while (*payload_string != 0) {
+              if (destination) {
+                *destination = *payload_string;
+                ++destination;
+              }
+              ++payload_string;
+              ++result;
+            }
+            break;
+          case 'd':
+          case 'D':
+            payload_int = grab_next_argument(argument_pointer, int);
+            entries = string_from_int(destination, payload_int);
+            if (destination)
+              destination += entries;
+            result += entries;
+            break;
+          case 'f':
+          case 'F':
+            payload_double = grab_next_argument(argument_pointer, double);
+            entries = string_from_double(destination, payload_double, double_precision);
+            if (destination)
+              destination += entries;
+            result += entries;
+            break;
+          default:
+            /* if the value we got is a digit, means we're going to start 
+             * (or to continue) a redefinition of the default precision required 
+             * in representing double values. We can have only positive values 
+             * so, it doesn't make any sense in checking for a negative sign.
+             */
+            if ((*(format + 1) >= '0') && (*(format + 1) <= '9')) {
+              if (new_precision_ongoing)
+                double_precision = (double_precision * 10) + (*(format + 1) - '0');
+              else {
+                double_precision = (*(format + 1) - '0');
+                new_precision_ongoing = 1;
+              }
+              ++format;
+              continue_loop = 1;
+            }
+            break;
+        }
+      } while(continue_loop);
       /* double jump to skip % and the code */
       ++format;
       ++format;
