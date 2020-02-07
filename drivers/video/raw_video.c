@@ -26,9 +26,9 @@ void raw_video_print_byte(s_raw_video_configuration *video_configuration, char d
 }
 void raw_video_scroll(s_raw_video_configuration *video_configuration, unsigned int rows) {
   size_t memory_offset = (rows * (video_configuration->_maximum_cols * 2)), total_memory;
-  if ((total_memory = ((video_configuration->_maximum_cols * video_configuration->_maximum_rows) * 2)) < 
+  if ((total_memory = ((video_configuration->_maximum_cols * video_configuration->_maximum_rows) * 2)) >
       memory_offset) {
-    memory_copy(video_configuration->_memory_video_entry_point,
+    memory_move(video_configuration->_memory_video_entry_point,
         (video_configuration->_memory_video_entry_point + memory_offset),
         (total_memory - memory_offset));
     memory_set(video_configuration->_memory_video_entry_point + (total_memory - memory_offset), 
