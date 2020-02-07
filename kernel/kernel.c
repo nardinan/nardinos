@@ -1,31 +1,42 @@
 #include "../drivers/ports.h"
 #include "../drivers/video/raw_video.h"
 #include "standard_lib/memory.h"
+void print_memory_status(s_raw_video_configuration *screen) {
+  char memory_description[1024];
+  for (int index = 0; 
+      (index < MEMORY_MAXIMUM_FRAGMENTS) &&
+      (memory.fragments[index].flags & e_memory_flag_memory_initialized); 
+      ++index) {
+    int bytes = (int)(memory.fragments[index].end - memory.fragments[index].start);
+    string_create(memory_description,
+        "[%d] memory from %p to %p (status = %s) %dbytes\n", index, memory.fragments[index].start, memory.fragments[index].end,
+        (memory.fragments[index].flags & e_memory_flag_memory_taken)?"taken":"free", bytes);
+    raw_video_print_string(screen, memory_description);
+  }
+  raw_video_print_string(screen, "-----\n");
+}
 void main() {
   s_raw_video_configuration screen;
   raw_video_set(&screen, RAW_VIDEO_CREATE_FORMAT(RAW_VIDEO_BLACK, RAW_VIDEO_WHITE), 
       (e_raw_video_flag_scrollable | e_raw_video_flag_advance_cursor));
   raw_video_clear_screen(&screen);
-  raw_video_print_string(&screen, "Hello, I don't know what I am doing!\n");
-  raw_video_print_string(&screen, "I have to be honest, I have no clue if this is going to work\n");
-  raw_video_print_string(&screen, "What do you think?\n");
-  char *string_1 = (char *)memory_alloc(60),
-       *string_2 = (char *)memory_alloc(60),
-       *string_3 = (char *)memory_alloc(80);
-  string_copy(string_1, "This has been allocated\n");
-  string_copy(string_2, "this has been allocated as well\n");
-  string_copy(string_3, "another allocation, then we are going to free it\n");
-  raw_video_print_string(&screen, string_1);
-  raw_video_print_string(&screen, string_2);
-  raw_video_print_string(&screen, string_3);
+  char *string_1 = (char *)memory_alloc(60);
+  char *string_2 = (char *)memory_alloc(60);
+  char *string_3 = (char *)memory_alloc(80);
+  print_memory_status(&screen);
+  char buffer[512];
+  string_create(buffer, "empty pointer %p\n", string_2);
+  raw_video_print_string(&screen, buffer);
   memory_free(string_2);
+  print_memory_status(&screen);
   char *string_4 = (char *)memory_alloc(20);
-  raw_video_print_string(&screen, string_4);
+  string_create(buffer, "allocating 20 bytes\n");
+  raw_video_print_string(&screen, buffer);
+  print_memory_status(&screen);
+  string_create(buffer, "emptying last string allocated %p\n", string_4);
+  raw_video_print_string(&screen, buffer);
   memory_free(string_4);
+  print_memory_status(&screen);
   memory_free(string_1);
-  size_t length = string_create(NULL_PTR, "this is a random value %s that should show something like %d %2f %% and %c\n", "'ANDREW'", -2512, 3.1415, 'X');
-  char *final_string = (char *)memory_alloc(length + 1);
-  string_create(final_string, "this is a random value %s that should show something like %d %4f %% and %c\n", "'ANDREW'", -2512, 3.1415, 'X');
-  raw_video_print_string(&screen, final_string);
-
+  //print_memory_status(&screen);
 }

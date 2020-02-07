@@ -10,6 +10,7 @@ extern int string_compare(const char *buffer, const char *other_buffer);
 extern void string_copy(char *destination, const char *source);
 extern size_t string_from_int(char *destination, int value);
 extern size_t string_from_double(char *destination, double value, int precision);
+extern size_t string_hex_from_void(char *destination, pointer_t value, size_t size);
 extern size_t string_create(char *destination, const char *format, ...) 
   __attribute__ ((format (printf, 2, 3)));
 #endif

@@ -82,6 +82,23 @@ size_t string_from_double(char *destination, double value, int precision) {
   }
   return result;
 }
+size_t string_hex_from_void(char *destination, pointer_t value, size_t size) {
+  size_t result = 0;
+  int nibbles = (size * 2);
+  while (nibbles > 0) {
+    unsigned char nibble = ((value>>((nibbles - 1) * 4))&0xf);
+    if (destination) {
+      if (nibble > 9)
+        *destination = ('A' + (nibble - 10));
+      else
+        *destination = ('0' + nibble);
+      ++destination;
+    }
+    --nibbles;
+    ++result;
+  }
+  return result;
+}
 size_t string_create(char *destination, const char *format, ...) {
   size_t result = 0;
   unsigned char *argument_pointer = grab_pointer_first_variable_argument(format);
@@ -93,6 +110,7 @@ size_t string_create(char *destination, const char *format, ...) {
         int payload_int, entries = 0;
         char payload_character, *payload_string;
         double payload_double;
+        pointer_t payload_pointer;
         continue_loop = 0;
         switch (*(format + 1)) {
           case 'c':
@@ -113,7 +131,7 @@ size_t string_create(char *destination, const char *format, ...) {
             break;
           case 's':
           case 'S':
-            payload_string = grab_next_argument(argument_pointer, char *);
+            payload_string = (char *)grab_next_argument(argument_pointer, void *);
             while (*payload_string != 0) {
               if (destination) {
                 *destination = *payload_string;
@@ -135,6 +153,16 @@ size_t string_create(char *destination, const char *format, ...) {
           case 'F':
             payload_double = grab_next_argument(argument_pointer, double);
             entries = string_from_double(destination, payload_double, double_precision);
+            if (destination)
+              destination += entries;
+            result += entries;
+            break;
+          case 'p':
+          case 'P':
+          case 'x':
+          case 'X':
+            payload_pointer = (pointer_t)grab_next_argument(argument_pointer, void *);
+            entries = string_hex_from_void(destination, payload_pointer, sizeof(int));
             if (destination)
               destination += entries;
             result += entries;

@@ -21,6 +21,7 @@
  * returns null pointer, we might want to call kernel panic */
 #define NULL_PTR ((void *)0x0)
 typedef unsigned int size_t;
+typedef long int pointer_t;
 typedef enum e_memory_flags {
   e_memory_flag_memory_initialized  = 0x01,
   e_memory_flag_memory_taken        = 0x02
@@ -32,6 +33,7 @@ typedef struct s_memory_area {
   s_memory_fragment fragments[MEMORY_MAXIMUM_FRAGMENTS];
   size_t elements;
 } s_memory_area;
+extern s_memory_area memory;
 void memory_copy(unsigned char *destination, unsigned char *source, size_t size);
 void memory_move(unsigned char *destination, unsigned char *source, size_t size);
 void memory_set(unsigned char *destination, unsigned char data, size_t size);
