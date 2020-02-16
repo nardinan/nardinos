@@ -1,4 +1,5 @@
 [extern interrupts_signals_handler]
+[extern interrupts_request_handler]
 
 ; This is the routine that every callback triggered by an 
 ; interrupt will call back in order to trigger the 
@@ -14,6 +15,34 @@ interrupts_signalc_callback:
   mov gs, ax
   call interrupts_signals_handler
   pop eax
+  mov ds, ax,
+  mov es, ax
+  mov fs, ax
+  mov gs, ax
+  popa
+  ; We need now to clean the error code and 
+  ; the interrupt code we've just pushed to
+  ; be sure we're not going to inject it to
+  ; then next interrupt.
+  add esp, 8
+  sti
+  iret
+
+; This is the routine that every callback triggered by an
+; interrupt request will call back in order to trigger the
+; C handler. As you can notice is very similar to the previous 
+; one (the one for signals) except for the rotuine called 
+interrupts_requestc_callback:
+  pusha
+  mov ax, ds
+  push eax
+  mov ax, 0x10
+  mov ds, ax
+  mov es, ax
+  mov fs, ax
+  mov gs, ax
+  call interrupts_request_handler
+  pop ebx
   mov ds, ax,
   mov es, ax
   mov fs, ax
@@ -68,6 +97,22 @@ global callback_interrupt_signal28
 global callback_interrupt_signal29
 global callback_interrupt_signal30
 global callback_interrupt_signal31
+global callback_interrupt_request0
+global callback_interrupt_request1
+global callback_interrupt_request2
+global callback_interrupt_request3
+global callback_interrupt_request4
+global callback_interrupt_request5
+global callback_interrupt_request6
+global callback_interrupt_request7
+global callback_interrupt_request8
+global callback_interrupt_request9
+global callback_interrupt_request10
+global callback_interrupt_request11
+global callback_interrupt_request12
+global callback_interrupt_request13
+global callback_interrupt_request14
+global callback_interrupt_request15
 
 callback_interrupt_signal0:
   cli
@@ -272,5 +317,99 @@ callback_interrupt_signal31:
   push byte 31
   jmp interrupts_signalc_callback
 
+callback_interrupt_request0:
+  cli
+  push byte 0
+  push byte 32
+  jmp interrupts_requestc_callback
 
+callback_interrupt_request1:
+  cli
+  push byte 1
+  push byte 33
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request2:
+  cli
+  push byte 2
+  push byte 34
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request3:
+  cli
+  push byte 3
+  push byte 35
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request4:
+  cli
+  push byte 4
+  push byte 36
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request5:
+  cli
+  push byte 5
+  push byte 37
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request6:
+  cli
+  push byte 6
+  push byte 38
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request7:
+  cli
+  push byte 7
+  push byte 39
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request8:
+  cli
+  push byte 8
+  push byte 40
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request9:
+  cli
+  push byte 9
+  push byte 41
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request10:
+  cli
+  push byte 10
+  push byte 42
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request11:
+  cli
+  push byte 11
+  push byte 43
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request12:
+  cli
+  push byte 12
+  push byte 44
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request13:
+  cli
+  push byte 13
+  push byte 45
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request14:
+  cli
+  push byte 14
+  push byte 46
+  jmp interrupts_requestc_callback
+
+callback_interrupt_request15:
+  cli
+  push byte 15
+  push byte 47
+  jmp interrupts_requestc_callback
 

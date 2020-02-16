@@ -1,6 +1,6 @@
-#include "../../kernel/standard_lib/standard_lib.h"
 #ifndef DRIVERS_VIDEO_RAW_VIDEO
 #define DRIVERS_VIDEO_RAW_VIDEO
+#include "../../kernel/standard_lib/standard_lib.h"
 #define RAW_VIDEO_BLACK           0x00
 #define RAW_VIDEO_BLUE            0x01
 #define RAW_VIDEO_GREEN           0x02
@@ -58,6 +58,7 @@ typedef enum e_raw_video_cursor_actions {
   e_raw_video_cursor_action_step_forward,
   e_raw_video_cursor_action_line_forward
 } e_raw_video_cursor_actions;
+extern s_raw_video_configuration standard_output;
 extern void raw_video_set(s_raw_video_configuration *video_configuration, 
     unsigned char character_format, unsigned char flags);
 extern void raw_video_print_byte(s_raw_video_configuration *video_configuration, char data);

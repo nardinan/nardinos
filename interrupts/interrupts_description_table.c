@@ -19,6 +19,7 @@ void interrupts_description_table_set_gate(int index, unsigned int handler) {
 }
 void interrupts_description_table_set(void) {
   interrupts_description_table_register.base = (unsigned int)&(interrupts_description_table_register);
-  interrupts_description_table_register.limit = (INTERRUPTS_DESCRIPTION_TABLE_ENTRIES * sizeof(s_interrupts_description_table_gate));
-  __asm__ __volatile__("lidtl (%0)": : "r"(&interrupts_description_table_register));
+  interrupts_description_table_register.limit = (INTERRUPTS_DESCRIPTION_TABLE_ENTRIES * sizeof(s_interrupts_description_table_gate)) - 1;
+  __asm__ __volatile__("lidtl (%0)" : : "r"(&interrupts_description_table_register));
 }
+

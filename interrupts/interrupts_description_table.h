@@ -2,7 +2,7 @@
 #define INTERRUPTS_DESCRIPTION_TABLE
 #define INTERRUPTS_DESCRIPTION_TABLE_ENTRIES 256
 #pragma pack(push, 1)
-typedef struct s_interrupts_description_table_gate {
+typedef struct INTERRUTPS_DESCRIPTION_TABLErrupts_description_table_gate {
   unsigned short int lower_offset, kernel_segment_selector;
   /* The flag here stored is the most important source of information; Following the 
    * code and the comments written by @cfenollosa we have:

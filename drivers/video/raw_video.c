@@ -1,4 +1,5 @@
 #include "raw_video.h"
+s_raw_video_configuration standard_output;
 void raw_video_set(s_raw_video_configuration *video_configuration, 
     unsigned char character_format, unsigned char flags) {
   memory_set((unsigned char *)video_configuration, 0, sizeof(s_raw_video_configuration));
