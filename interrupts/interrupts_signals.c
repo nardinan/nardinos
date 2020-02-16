@@ -2,7 +2,7 @@
 #include "../drivers/video/raw_video.h"
 #include "../kernel/standard_lib/standard_lib.h"
 t_callback_interrupt_request interrupts_handler[INTERRUPTS_DESCRIPTION_TABLE_ENTRIES];
-const char *interrupt_description[] = {
+char *interrupt_description[] = {
   "division by zero",
   "debug",
   "non maskable interrupt",
@@ -116,7 +116,7 @@ void interrupts_request_register(unsigned char number, t_callback_interrupt_requ
 }
 void interrupts_signals_handler(s_asm_registers registers) {
   char buffer[128];
-  string_create(buffer, "INT SIG: %d\n", registers.interrupt_number);
+  string_create(buffer, "INT SIG: %d (%s)\n", registers.interrupt_number, interrupt_description[registers.interrupt_number]);
   raw_video_print_string(&standard_output, buffer);
 }
 void interrupts_request_handler(s_asm_registers registers) {

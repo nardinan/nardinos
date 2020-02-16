@@ -9,7 +9,7 @@ void main() {
       (e_raw_video_flag_scrollable | e_raw_video_flag_advance_cursor));
   raw_video_clear_screen(&standard_output);
   interrupts_signals_register();
-  __asm__ __volatile__("sti");
+  asm volatile("sti");
   timer_set(50);
   keyboard_set();
 }

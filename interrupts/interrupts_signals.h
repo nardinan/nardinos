@@ -110,7 +110,6 @@ typedef struct s_asm_registers {
   unsigned int data_segment, edi, esi, epb, esp, ebx, edx, ecx, eax, interrupt_number, error_code, eip, cs, eflags, usersp, ss; 
 } s_asm_registers;
 typedef void (*t_callback_interrupt_request)(s_asm_registers);
-extern const char *interrupt_description[];
 void interrupts_signals_register(void);
 void interrupts_request_register(unsigned char number, t_callback_interrupt_request callback);
 void interrupts_signals_handler(s_asm_registers registers);
