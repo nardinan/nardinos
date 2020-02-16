@@ -1,6 +1,6 @@
-SOURCES = $(wildcard kernel/*.c kernel/*/*.c drivers/*.c drivers/*/*.c)
-HEADERS = $(wildcard kernel/*.h kernel/*/*.c drivers/*.h drivers/*/*.h)
-OBJ = ${SOURCES:.c=.o}
+SOURCES = $(wildcard kernel/*.c kernel/*/*.c interrupts/*.c drivers/*.c drivers/*/*.c)
+HEADERS = $(wildcard kernel/*.h kernel/*/*.c interrupts/*.h drivers/*.h drivers/*/*.h)
+OBJ = ${SOURCES:.c=.o interrupts/interrupts.o}
 CC = /usr/local/i386_elf_gcc/bin/i386-elf-gcc
 GDB = /usr/local/i386_elf_gcc/bin/i386-elf-gdb
 CFLAGS = -g

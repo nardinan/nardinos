@@ -123,7 +123,7 @@ void memory_free(void *pointer) {
           size_t head_residual_memory = (casted_pointer - memory.fragments[index].start),
                  /* we can relay on the fact that the tail of the pointer is in the same memory block */
                  tail_residual_memory = (memory.fragments[index].end - (casted_pointer + bytes + sizeof(size_t)));
-          int required_slots = 0;
+          unsigned int required_slots = 0;
           /* we check now if we have enough space in the queue to host these fragments of memory and,
            * in the worst case scenario, we're not going to release that part of memory (sigh) 
            */
