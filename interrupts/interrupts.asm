@@ -15,7 +15,7 @@ interrupts_signalc_callback:
   mov gs, ax
   call interrupts_signals_handler
   pop eax
-  mov ds, ax,
+  mov ds, ax
   mov es, ax
   mov fs, ax
   mov gs, ax
@@ -43,10 +43,10 @@ interrupts_requestc_callback:
   mov gs, ax
   call interrupts_request_handler
   pop ebx
-  mov ds, ax,
-  mov es, ax
-  mov fs, ax
-  mov gs, ax
+  mov ds, bx
+  mov es, bx
+  mov fs, bx
+  mov gs, bx
   popa
   ; We need now to clean the error code and 
   ; the interrupt code we've just pushed to

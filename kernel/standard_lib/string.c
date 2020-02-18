@@ -99,9 +99,8 @@ size_t string_hex_from_void(char *destination, pointer_t value, size_t size) {
   }
   return result;
 }
-size_t string_create(char *destination, const char *format, ...) {
+size_t string_create_stack_pointer(char *destination, const char *format, unsigned char *argument_stack_pointer) {
   size_t result = 0;
-  unsigned char *argument_pointer = grab_pointer_first_variable_argument(format);
   unsigned int double_precision = STRING_DOUBLE_DEFAULT_PRECISION;
   while (*format != 0) {
     if (*format == '%') {
@@ -115,7 +114,7 @@ size_t string_create(char *destination, const char *format, ...) {
         switch (*(format + 1)) {
           case 'c':
           case 'C':
-            payload_character = (char)grab_next_argument(argument_pointer, int);
+            payload_character = (char)grab_next_argument(argument_stack_pointer, int);
             if (destination) {
               *destination = payload_character;
               ++destination;
@@ -131,7 +130,7 @@ size_t string_create(char *destination, const char *format, ...) {
             break;
           case 's':
           case 'S':
-            payload_string = (char *)grab_next_argument(argument_pointer, void *);
+            payload_string = (char *)grab_next_argument(argument_stack_pointer, void *);
             while (*payload_string != 0) {
               if (destination) {
                 *destination = *payload_string;
@@ -143,7 +142,7 @@ size_t string_create(char *destination, const char *format, ...) {
             break;
           case 'd':
           case 'D':
-            payload_int = grab_next_argument(argument_pointer, int);
+            payload_int = grab_next_argument(argument_stack_pointer, int);
             entries = string_from_int(destination, payload_int);
             if (destination)
               destination += entries;
@@ -151,7 +150,7 @@ size_t string_create(char *destination, const char *format, ...) {
             break;
           case 'f':
           case 'F':
-            payload_double = grab_next_argument(argument_pointer, double);
+            payload_double = grab_next_argument(argument_stack_pointer, double);
             entries = string_from_double(destination, payload_double, double_precision);
             if (destination)
               destination += entries;
@@ -161,7 +160,7 @@ size_t string_create(char *destination, const char *format, ...) {
           case 'P':
           case 'x':
           case 'X':
-            payload_pointer = (pointer_t)grab_next_argument(argument_pointer, void *);
+            payload_pointer = (pointer_t)grab_next_argument(argument_stack_pointer, void *);
             entries = string_hex_from_void(destination, payload_pointer, sizeof(int));
             if (destination)
               destination += entries;
@@ -202,4 +201,19 @@ size_t string_create(char *destination, const char *format, ...) {
     *destination = 0;
   return result;
 }
-
+size_t string_create(char *destination, const char *format, ...) {
+  unsigned char *argument_stack_pointer = grab_pointer_first_variable_argument(format);
+  return string_create_stack_pointer(destination, format, argument_stack_pointer);
+}
+void kernel_printf(const char *format, ...) {
+  unsigned char *argument_stack_pointer = grab_pointer_first_variable_argument(format);
+  char *buffer;
+  size_t length;
+  if ((length = string_create_stack_pointer(NULL_PTR, format, argument_stack_pointer)) > 0) {
+    if ((buffer = (char *)memory_alloc(length + 1))) {
+      string_create_stack_pointer(buffer, format, argument_stack_pointer);
+      raw_video_print_string(&standard_output, buffer);
+      memory_free(buffer);
+    }
+  }
+}

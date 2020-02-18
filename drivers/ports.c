@@ -5,7 +5,7 @@ unsigned char port_byte_read(unsigned short int port) {
   return result;
 }
 void port_byte_write(unsigned short int port, unsigned char data) {
-  __asm__("out %%al, %%dx" : : "a" (data), "d" (port));
+  __asm__ __volatile__("out %%al, %%dx" : : "a" (data), "d" (port));
 }
 unsigned short int port_word_read(unsigned short int port) {
   unsigned short int result;
@@ -13,6 +13,6 @@ unsigned short int port_word_read(unsigned short int port) {
   return result;
 }
 void port_word_write(unsigned short int port, unsigned short data) {
-  __asm__("out %%ax, %%dx" : : "a" (data), "d" (port));
+  __asm__ __volatile__("out %%ax, %%dx" : : "a" (data), "d" (port));
 }
 

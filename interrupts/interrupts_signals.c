@@ -115,21 +115,17 @@ void interrupts_request_register(unsigned char number, t_callback_interrupt_requ
   interrupts_handler[number] = callback;
 }
 void interrupts_signals_handler(s_asm_registers registers) {
-  char buffer[128];
-  string_create(buffer, "INT SIG: %d (%s)\n", registers.interrupt_number, interrupt_description[registers.interrupt_number]);
-  raw_video_print_string(&standard_output, buffer);
+  kernel_printf("INT SIG: %d (%s)\n", registers.interrupt_number, interrupt_description[registers.interrupt_number]);
 }
 void interrupts_request_handler(s_asm_registers registers) {
   /* when we receive a interrupt request we need to reset some statuses 
    * in order to avoid to receive the very same request, once again, 
    * just after.
    */
-  char buffer[128];
+  kernel_printf("INT REQ: %d\n", registers.interrupt_number);
   if (registers.interrupt_number >= 40) 
     port_byte_write(0xa0, 0x20);
   port_byte_write(0x20, 0x20);
   if (interrupts_handler[registers.interrupt_number])
     interrupts_handler[registers.interrupt_number](registers);
-  string_create(buffer, "INT REQ: %d\n", registers.interrupt_number);
-  raw_video_print_string(&standard_output, buffer);
 }
